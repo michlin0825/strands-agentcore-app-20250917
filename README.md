@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # AI Agent Powered by Bedrock AgentCore
 
 A secure, intelligent chat interface that combines AI conversations with real-time web search and knowledge base access, built with Streamlit and Amazon Bedrock AgentCore Runtime.
@@ -131,11 +130,12 @@ python deploy_agentcore_v2.py
 
 ## 🔍 Key Implementation Details
 
-### Strands Agent with MCP Tools
+### Strands Agent with Modular Data Sourcing
 ```python
-# agent.py - Strands agent with optimized prompt
+# agent.py - Strands agent with separated external and internal data sourcing
 from strands import Agent
-from tavily_tool import web_search, knowledge_search
+from web_search_tool import web_search
+from knowledge_base_tool import knowledge_search
 
 agent = Agent(
     tools=[web_search, knowledge_search],
@@ -143,8 +143,58 @@ agent = Agent(
 )
 ```
 
+### External Data Sourcing (Tavily/MCP)
+```python
+# web_search_tool.py - Web search for current/external information
+@tool
+def web_search(query: str) -> str:
+    """
+    Search the web for current information using Tavily.
+    Use this when you need up-to-date information, news, or facts.
+    """
+    api_key = os.getenv('TAVILY_API_KEY')
+    url = "https://api.tavily.com/search"
+    payload = {
+        "api_key": api_key,
+        "query": query,
+        "search_depth": "basic",
+        "include_answer": True,
+        "max_results": 3
+    }
+    # Returns formatted web search results
+```
+
+### Internal Data Sourcing (Bedrock Knowledge Base/RAG)
+```python
+# knowledge_base_tool.py - Knowledge Base search for internal/company information
+@tool
+def knowledge_search(query: str) -> str:
+    """
+    Search company knowledge base for internal information.
+    Use this for company policies, procedures, documentation, and internal knowledge.
+    """
+    knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
+    
+    session = boto3.Session(profile_name="CloudChef01")
+    client = session.client('bedrock-agent-runtime', region_name='us-east-1')
+    
+    response = client.retrieve_and_generate(
+        input={'text': query},
+        retrieveAndGenerateConfiguration={
+            'type': 'KNOWLEDGE_BASE',
+            'knowledgeBaseConfiguration': {
+                'knowledgeBaseId': knowledge_base_id,
+                'modelArn': 'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+            }
+        }
+    )
+    
+    return response['output']['text']
+```
+
 ### Cognito Authentication & Persistent Sessions
 ```python
+# streamlit_app/app_env.py - Authentication and session management
 def authenticate_user(username, password):
     client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION'))
     response = client.initiate_auth(
@@ -162,7 +212,7 @@ def set_persistent_session(email):
 
 ### AgentCore Response Parsing
 ```python
-# Extract from deeply nested structure
+# streamlit_app/app_env.py - Extract from deeply nested structure
 return response_data['response']['content'][0]['text']['content'][0]['text']
 ```
 
@@ -190,8 +240,9 @@ strands-agentcore-app-20250917/
 │   └── screenshot_2.png            # Q&A in Action
 ├── streamlit_app/
 │   └── app_env.py                  # Main Streamlit app with Cognito auth
-├── agent.py                        # Strands agent with concise prompt
-├── tavily_tool.py                  # MCP tools (web search + KB)
+├── agent.py                        # Strands agent with modular data sourcing
+├── web_search_tool.py              # External data sourcing (Tavily/MCP)
+├── knowledge_base_tool.py          # Internal data sourcing (Bedrock KB/RAG)
 ├── Dockerfile                      # Container configuration
 ├── requirements.txt                # Python dependencies
 ├── deploy_agentcore_v2.py          # Deployment automation
