@@ -132,7 +132,7 @@ python deploy_agentcore_v2.py
 
 ### Strands Agent with MCP Tools
 ```python
-# agent.py - Strands agent with optimized prompt
+# agent.py - Strands agent with dual data sourcing capabilities
 from strands import Agent
 from tavily_tool import web_search, knowledge_search
 
@@ -142,12 +142,28 @@ agent = Agent(
 )
 ```
 
-### Bedrock Knowledge Base Integration
+### External Data Sourcing (Tavily/MCP)
 ```python
-# tavily_tool.py - Knowledge Base search with retrieve_and_generate
+# tavily_tool.py - Web search for current/external information
+@tool
+def web_search(query: str) -> str:
+    """
+    Search the web for current information using Tavily.
+    Use this when you need up-to-date information, news, or facts.
+    """
+    # Tavily API implementation for external data
+    # Returns current web information, news, real-time data
+```
+
+### Internal Data Sourcing (Bedrock Knowledge Base/RAG)
+```python
+# tavily_tool.py - Knowledge Base search for internal/company information
 @tool
 def knowledge_search(query: str) -> str:
-    """Search company knowledge base for internal information."""
+    """
+    Search company knowledge base for internal information.
+    Use this for company policies, procedures, documentation, and internal knowledge.
+    """
     knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
     
     session = boto3.Session(profile_name="CloudChef01")
