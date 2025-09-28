@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Agent Powered by Bedrock AgentCore
 
 A secure, intelligent chat interface that combines AI conversations with real-time web search and knowledge base access, built with Streamlit and Amazon Bedrock AgentCore Runtime.
@@ -217,3 +218,6 @@ strands-agentcore-app-20250917/
 ---
 
 **License**: MIT License - see [LICENSE](LICENSE) file for details.
+=======
+# strands-agentcore-app-20250917
+>>>>>>> 89a8b04a8af3df5ebea8e12844c103d7ad725c08
