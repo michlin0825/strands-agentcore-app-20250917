@@ -169,6 +169,7 @@ def knowledge_search(query: str) -> str:
 
 ### Cognito Authentication & Persistent Sessions
 ```python
+# streamlit_app/app_env.py - Authentication and session management
 def authenticate_user(username, password):
     client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION'))
     response = client.initiate_auth(
@@ -186,7 +187,7 @@ def set_persistent_session(email):
 
 ### AgentCore Response Parsing
 ```python
-# Extract from deeply nested structure
+# streamlit_app/app_env.py - Extract from deeply nested structure
 return response_data['response']['content'][0]['text']['content'][0]['text']
 ```
 
