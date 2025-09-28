@@ -142,6 +142,31 @@ agent = Agent(
 )
 ```
 
+### Bedrock Knowledge Base Integration
+```python
+# tavily_tool.py - Knowledge Base search with retrieve_and_generate
+@tool
+def knowledge_search(query: str) -> str:
+    """Search company knowledge base for internal information."""
+    knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
+    
+    session = boto3.Session(profile_name="CloudChef01")
+    client = session.client('bedrock-agent-runtime', region_name='us-east-1')
+    
+    response = client.retrieve_and_generate(
+        input={'text': query},
+        retrieveAndGenerateConfiguration={
+            'type': 'KNOWLEDGE_BASE',
+            'knowledgeBaseConfiguration': {
+                'knowledgeBaseId': knowledge_base_id,
+                'modelArn': 'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+            }
+        }
+    )
+    
+    return response['output']['text']
+```
+
 ### Cognito Authentication & Persistent Sessions
 ```python
 def authenticate_user(username, password):
