@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Strands AgentCore App with Tavily Search + Bedrock Knowledge Base
+Strands AgentCore App with separated external and internal data sourcing
 """
 
 import os
@@ -9,7 +9,8 @@ import logging
 from typing import Dict, Any
 from strands import Agent
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
-from tavily_tool import web_search, knowledge_search
+from web_search_tool import web_search
+from knowledge_base_tool import knowledge_search
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +22,7 @@ os.environ["BYPASS_TOOL_CONSENT"] = "true"
 # Initialize BedrockAgentCoreApp
 app = BedrockAgentCoreApp()
 
-# Initialize Strands agent with both web search and knowledge base tools
+# Initialize Strands agent with separated external and internal data sourcing tools
 agent = Agent(
     tools=[web_search, knowledge_search],
     system_prompt="You are a helpful AI assistant. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Keep responses brief while maintaining factual accuracy."
@@ -37,7 +38,7 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
         
         logger.info(f"Processing: {user_message}")
         
-        # Process with Strands agent (now with both Tavily search and Knowledge Base)
+        # Process with Strands agent (now with separated external and internal tools)
         result = agent(user_message)
         
         return {
@@ -59,5 +60,5 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    logger.info("Starting Strands AgentCore App with Tavily + Knowledge Base...")
+    logger.info("Starting Strands AgentCore App with separated data sourcing tools...")
     app.run()

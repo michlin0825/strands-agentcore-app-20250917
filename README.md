@@ -130,11 +130,12 @@ python deploy_agentcore_v2.py
 
 ## 🔍 Key Implementation Details
 
-### Strands Agent with MCP Tools
+### Strands Agent with Modular Data Sourcing
 ```python
-# agent.py - Strands agent with dual data sourcing capabilities
+# agent.py - Strands agent with separated external and internal data sourcing
 from strands import Agent
-from tavily_tool import web_search, knowledge_search
+from web_search_tool import web_search
+from knowledge_base_tool import knowledge_search
 
 agent = Agent(
     tools=[web_search, knowledge_search],
@@ -144,20 +145,28 @@ agent = Agent(
 
 ### External Data Sourcing (Tavily/MCP)
 ```python
-# tavily_tool.py - Web search for current/external information
+# web_search_tool.py - Web search for current/external information
 @tool
 def web_search(query: str) -> str:
     """
     Search the web for current information using Tavily.
     Use this when you need up-to-date information, news, or facts.
     """
-    # Tavily API implementation for external data
-    # Returns current web information, news, real-time data
+    api_key = os.getenv('TAVILY_API_KEY')
+    url = "https://api.tavily.com/search"
+    payload = {
+        "api_key": api_key,
+        "query": query,
+        "search_depth": "basic",
+        "include_answer": True,
+        "max_results": 3
+    }
+    # Returns formatted web search results
 ```
 
 ### Internal Data Sourcing (Bedrock Knowledge Base/RAG)
 ```python
-# tavily_tool.py - Knowledge Base search for internal/company information
+# knowledge_base_tool.py - Knowledge Base search for internal/company information
 @tool
 def knowledge_search(query: str) -> str:
     """
@@ -231,8 +240,9 @@ strands-agentcore-app-20250917/
 │   └── screenshot_2.png            # Q&A in Action
 ├── streamlit_app/
 │   └── app_env.py                  # Main Streamlit app with Cognito auth
-├── agent.py                        # Strands agent with concise prompt
-├── tavily_tool.py                  # MCP tools (web search + KB)
+├── agent.py                        # Strands agent with modular data sourcing
+├── web_search_tool.py              # External data sourcing (Tavily/MCP)
+├── knowledge_base_tool.py          # Internal data sourcing (Bedrock KB/RAG)
 ├── Dockerfile                      # Container configuration
 ├── requirements.txt                # Python dependencies
 ├── deploy_agentcore_v2.py          # Deployment automation
