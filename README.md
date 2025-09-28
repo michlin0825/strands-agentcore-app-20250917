@@ -183,15 +183,27 @@ python test_cognito_auth.py        # Test authentication
 
 ```
 strands-agentcore-app-20250917/
-├── README.md
-├── screenshots/                      # App screenshots
-├── streamlit_app/app_env.py         # Main app with Cognito auth
-├── agent.py                         # Strands agent with concise prompt
-├── tavily_tool.py                   # MCP tools (web search + KB)
-├── deploy_agentcore_v2.py           # Deployment automation
-├── test_deployed_agent.py           # Testing scripts
-├── .env / .env.example              # Environment configuration
-└── start_env_app.sh                 # Startup script
+├── README.md                        # Project documentation
+├── LICENSE                          # MIT License
+├── screenshots/                     # App screenshots
+│   ├── screenshot_1.png            # App Login
+│   └── screenshot_2.png            # Q&A in Action
+├── streamlit_app/
+│   └── app_env.py                  # Main Streamlit app with Cognito auth
+├── agent.py                        # Strands agent with concise prompt
+├── tavily_tool.py                  # MCP tools (web search + KB)
+├── Dockerfile                      # Container configuration
+├── requirements.txt                # Python dependencies
+├── deploy_agentcore_v2.py          # Deployment automation
+├── start_env_app.sh               # Startup script
+├── test_deployed_agent.py         # Agent testing
+├── test_cognito_auth.py           # Authentication testing
+├── test_response_parsing.py       # Response parsing validation
+├── .env.example                   # Environment template
+├── .gitignore                     # Git exclusions
+├── DEPLOYMENT_INSTRUCTIONS.md     # Manual deployment guide
+├── MANUAL_RUNTIME_CREATION.md     # Runtime creation steps
+└── UPDATE_RUNTIME.md              # Runtime update instructions
 ```
 
 ## 🎯 Usage Examples
