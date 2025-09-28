@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # AI Agent Powered by Bedrock AgentCore
 
 A secure, intelligent chat interface that combines AI conversations with real-time web search and knowledge base access, built with Streamlit and Amazon Bedrock AgentCore Runtime.
