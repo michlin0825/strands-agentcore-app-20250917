@@ -52,10 +52,10 @@ sequenceDiagram
 
 ### Core Technologies
 - **Amazon Bedrock AgentCore Runtime**: Serverless AI agent hosting with microVM isolation and 8-hour execution time
-- **Strands SDK**: Framework-agnostic agent development with MCP tool integration
+- **Strands SDK**: Framework-agnostic agent development with modular MCP tool integration
 - **Amazon Cognito**: User authentication with persistent session management
 - **Streamlit**: Interactive web interface with real-time chat updates
-- **MCP Tools**: Tavily Web Search + Bedrock Knowledge Base (ID: VVJWR6EQPY)
+- **Modular Tools**: Separated external (Tavily Web Search) and internal (Bedrock Knowledge Base ID: VVJWR6EQPY) data sourcing
 
 ## 📸 Screenshots
 
@@ -127,6 +127,8 @@ python deploy_agentcore_v2.py
 2. **Name**: `StrandsAgentCoreApp20250917`
 3. **Container URI**: `111735445051.dkr.ecr.us-east-1.amazonaws.com/strands-agentcore-app-20250917:latest`
 4. **Environment Variables**: `TAVILY_API_KEY`, `BEDROCK_KNOWLEDGE_BASE_ID`
+
+**Detailed Steps**: See `MANUAL_RUNTIME_CREATION.md` for complete runtime setup instructions
 
 ## 🔍 Key Implementation Details
 
@@ -234,7 +236,7 @@ python test_cognito_auth.py        # Test authentication
 ```
 strands-agentcore-app-20250917/
 ├── README.md                        # Project documentation
-├── LICENSE                          # MIT License
+├── MANUAL_RUNTIME_CREATION.md       # Runtime creation guide
 ├── screenshots/                     # App screenshots
 │   ├── screenshot_1.png            # App Login
 │   └── screenshot_2.png            # Q&A in Action
@@ -251,22 +253,37 @@ strands-agentcore-app-20250917/
 ├── test_cognito_auth.py           # Authentication testing
 ├── test_response_parsing.py       # Response parsing validation
 ├── .env.example                   # Environment template
+├── .env                           # Local environment variables
 ├── .gitignore                     # Git exclusions
-├── DEPLOYMENT_INSTRUCTIONS.md     # Manual deployment guide
-├── MANUAL_RUNTIME_CREATION.md     # Runtime creation steps
-└── UPDATE_RUNTIME.md              # Runtime update instructions
+└── venv/                          # Python virtual environment
 ```
 
 ## 🎯 Usage Examples
 
 1. **Login**: Use Cognito credentials to authenticate
-2. **Current Events**: "What's happening in AI today?"
-3. **Technical Questions**: "Explain AWS Lambda concisely"
-4. **Knowledge Queries**: Domain-specific questions using configured KB
+2. **Current Events**: "What's happening in AI today?" *(uses web_search_tool.py)*
+3. **Technical Questions**: "Explain AWS Lambda concisely" *(uses knowledge_base_tool.py)*
+4. **Knowledge Queries**: Domain-specific questions using configured KB *(uses knowledge_base_tool.py)*
 5. **Session Persistence**: Refresh page - stay logged in!
+
+## 🧪 Testing & Troubleshooting
+
+### Test Commands
+```bash
+python test_deployed_agent.py      # Test agent connectivity
+python test_cognito_auth.py        # Test authentication
+python test_response_parsing.py    # Test response parsing
+```
+
+### Common Issues
+- **Authentication Failed**: Check Cognito credentials in `.env`
+- **Runtime ARN Error**: Verify environment variable is set correctly
+- **Session Not Persisting**: Check browser allows URL parameters
+- **Module Import Error**: Ensure virtual environment is activated
 
 ## 📝 Version History
 
+- **v4.0** (2025-09-28): Modular architecture with separated data sourcing tools, codebase cleanup
 - **v3.0** (2025-01-28): Cognito authentication, persistent sessions, concise responses
 - **v2.0** (2025-01-28): Environment-based configuration, updated naming
 - **v1.0** (2025-01-28): Working implementation with response parsing
