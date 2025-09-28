@@ -214,10 +214,6 @@ strands-agentcore-app-20250917/
 - [Amazon Cognito Documentation](https://docs.aws.amazon.com/cognito/)
 - [Streamlit Documentation](https://docs.streamlit.io/)
 - [MCP (Model Context Protocol)](https://modelcontextprotocol.io/)
-
----
-
-**License**: MIT License - see [LICENSE](LICENSE) file for details.
 =======
 # strands-agentcore-app-20250917
 >>>>>>> 89a8b04a8af3df5ebea8e12844c103d7ad725c08
