@@ -28,6 +28,72 @@ A secure AI chat interface with real-time web search and knowledge base access, 
 - **Streamlit**: Interactive web interface with real-time chat updates
 - **Modular Tools**: Separated external (Tavily Web Search) and internal (Bedrock Knowledge Base) data sourcing
 
+### SDK Integration & Value Proposition
+
+#### 🤖 **Strands SDK - Agent Development Framework**
+**What it provides:**
+- **Agent Definition**: `Agent()` class for creating conversational AI agents
+- **Tool Integration**: `@tool` decorator for seamless MCP tool integration
+- **Framework Agnostic**: Works with any deployment platform (not tied to AWS)
+- **Modular Architecture**: Clean separation between agent logic and tools
+
+**In this app:**
+```python
+# Agent creation with tools
+agent = Agent(
+    tools=[web_search, knowledge_search],
+    system_prompt="You are a helpful AI assistant..."
+)
+
+# Tool definition
+@tool
+def web_search(query: str) -> str:
+    # External data sourcing via Tavily API
+```
+
+**Value:** Provides the **agent intelligence and tool orchestration** - the "brain" of the application.
+
+#### ☁️ **Bedrock AgentCore Runtime - Serverless Deployment Platform**
+**What it provides:**
+- **Serverless Hosting**: Deploy agents without managing infrastructure
+- **MicroVM Isolation**: Secure, isolated execution environment
+- **Auto-scaling**: Handles concurrent users automatically
+- **Memory Management**: Built-in conversation context via `runtimeSessionId`
+- **AWS Integration**: Native integration with AWS services
+
+**In this app:**
+```python
+# Deployment wrapper
+app = BedrockAgentCoreApp()
+
+@app.entrypoint
+def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
+    # AgentCore handles: scaling, isolation, memory, AWS integration
+    result = agent(user_message)  # Strands handles: intelligence, tools
+```
+
+**Value:** Provides **production-ready deployment and scaling** - the "infrastructure" of the application.
+
+#### 🔄 **Why Both SDKs Together Create Superior Value**
+
+| Feature | Strands SDK | AgentCore Runtime | Combined Benefit |
+|---------|-------------|-------------------|------------------|
+| **Agent Logic** | ✅ Core intelligence | ❌ Not provided | **Smart agents with clean code** |
+| **Tool Integration** | ✅ MCP framework | ❌ Not provided | **Modular, reusable tools** |
+| **Serverless Hosting** | ❌ Not provided | ✅ Auto-scaling | **Production deployment** |
+| **Memory Management** | ❌ Basic only | ✅ Session-based | **Stateful conversations** |
+| **AWS Integration** | ❌ Not provided | ✅ Native support | **Enterprise-ready security** |
+| **Multi-tenancy** | ❌ Not provided | ✅ Automatic isolation | **Safe concurrent users** |
+
+#### 🎯 **The Perfect Partnership**
+- **Strands SDK**: Handles the **"what"** - agent intelligence, tool orchestration, conversation logic
+- **AgentCore Runtime**: Handles the **"how"** - deployment, scaling, security, memory, AWS integration
+- **Together**: Create **production-ready, intelligent agents** that scale automatically while maintaining clean, modular code
+
+**Without Strands**: You'd need custom tool integration and agent logic
+**Without AgentCore**: You'd need custom deployment, scaling, and memory management
+**With Both**: You get enterprise-grade AI agents with minimal infrastructure complexity
+
 ### Data Flow
 ```mermaid
 sequenceDiagram
