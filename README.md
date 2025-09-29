@@ -11,6 +11,14 @@ A secure AI chat interface with real-time web search and knowledge base access, 
 - 📚 **Knowledge Base Access** - Domain-specific queries using Bedrock Knowledge Base
 - ⚡ **Modular Architecture** - Separated external and internal data sourcing
 
+## 📸 Screenshots
+
+### App Login
+![App Login](screenshots/screenshot_1.png)
+
+### Q&A in Action
+![Q&A in Action](screenshots/screenshot_2.png)
+
 ## 🏗️ Architecture
 
 ### Core Technologies
@@ -56,14 +64,6 @@ sequenceDiagram
     Streamlit-->>User: Display clean answer
 ```
 
-## 📸 Screenshots
-
-### App Login
-![App Login](screenshots/screenshot_1.png)
-
-### Q&A in Action
-![Q&A in Action](screenshots/screenshot_2.png)
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -89,6 +89,14 @@ cp .env.example .env
 ```
 
 **Access**: http://localhost:8501
+
+## 🎯 Usage Examples
+
+1. **Login**: Use Cognito credentials to authenticate
+2. **Current Events**: "What's happening in AI today?" *(uses web_search_tool.py)*
+3. **Technical Questions**: "Explain AWS Lambda concisely" *(uses knowledge_base_tool.py)*
+4. **Knowledge Queries**: Domain-specific questions *(uses knowledge_base_tool.py)*
+5. **Session Persistence**: Refresh page - stay logged in!
 
 ## 🔧 Configuration
 
@@ -124,6 +132,21 @@ python deploy_agentcore_v2.py
 4. **Environment Variables**: Set `TAVILY_API_KEY` and `KNOWLEDGE_BASE_ID`
 
 **Detailed Steps**: See `MANUAL_RUNTIME_CREATION.md`
+
+## 🧪 Testing & Troubleshooting
+
+### Test Commands
+```bash
+python test_deployed_agent.py      # Test agent connectivity
+python test_cognito_auth.py        # Test authentication
+python test_response_parsing.py    # Test response parsing
+```
+
+### Common Issues
+- **Authentication Failed**: Check Cognito credentials in `.env`
+- **Runtime ARN Error**: Verify environment variable is set correctly
+- **Session Not Persisting**: Check browser allows URL parameters
+- **Module Import Error**: Ensure virtual environment is activated
 
 ## 🔍 Implementation Details
 
@@ -192,29 +215,6 @@ strands-agentcore-app-20250917/
 ├── .gitignore                     # Git exclusions
 └── venv/                          # Python virtual environment
 ```
-
-## 🎯 Usage Examples
-
-1. **Login**: Use Cognito credentials to authenticate
-2. **Current Events**: "What's happening in AI today?" *(uses web_search_tool.py)*
-3. **Technical Questions**: "Explain AWS Lambda concisely" *(uses knowledge_base_tool.py)*
-4. **Knowledge Queries**: Domain-specific questions *(uses knowledge_base_tool.py)*
-5. **Session Persistence**: Refresh page - stay logged in!
-
-## 🧪 Testing & Troubleshooting
-
-### Test Commands
-```bash
-python test_deployed_agent.py      # Test agent connectivity
-python test_cognito_auth.py        # Test authentication
-python test_response_parsing.py    # Test response parsing
-```
-
-### Common Issues
-- **Authentication Failed**: Check Cognito credentials in `.env`
-- **Runtime ARN Error**: Verify environment variable is set correctly
-- **Session Not Persisting**: Check browser allows URL parameters
-- **Module Import Error**: Ensure virtual environment is activated
 
 ## 📝 Version History
 
