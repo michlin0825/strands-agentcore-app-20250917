@@ -155,6 +155,34 @@ This enhancement transforms the agent from basic Q&A to intelligent research ass
 - **Autonomous decision making** for intelligent processing
 - **Comprehensive research** delivering higher accuracy
 
+## 📊 Built-in Observability
+
+### Automatic Monitoring (No Setup Required)
+Your app automatically gets enterprise-grade monitoring through AgentCore Runtime:
+
+- **📈 Runtime Metrics**: Invocation count, duration, error rates
+- **🧠 Memory Metrics**: Session operations and performance  
+- **🔧 Tool Metrics**: Tool usage and success rates
+- **👥 User Metrics**: Session count and user activity
+
+**View in CloudWatch**: 
+- Navigate to CloudWatch → Metrics → AWS/BedrockAgentCore
+- Monitor your agent's performance in real-time
+- Set up alarms for error rates or high latency
+
+**What You Can Monitor Right Now:**
+1. **Performance**: How fast is my agent responding?
+2. **Usage**: How many users are using the app?
+3. **Reliability**: What's my error rate?
+4. **Tool Effectiveness**: Which tools are being used most?
+
+### Enhanced Observability (Optional)
+For detailed tracing and custom metrics:
+- Enable CloudWatch Transaction Search for end-to-end tracing
+- Add ADOT SDK for custom application metrics
+- Configure OpenTelemetry for detailed span analysis
+- Access GenAI Observability Dashboard for AI-specific insights
+
 ## 🚀 Quick Start & Configuration
 
 ### Prerequisites
