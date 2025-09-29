@@ -53,55 +53,6 @@ def web_search(query: str) -> str:
 
 **Value:** Provides the **agent intelligence and tool orchestration** - the "brain" of the application.
 
-## 🧠 Enhanced Intelligence System
-
-### Autonomous Reasoning Prompt
-The app uses an advanced system prompt that enables multi-step reasoning and autonomous tool selection:
-
-```python
-system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
-
-For each query:
-1. Analyze if you need current information (use web_search)
-2. Check if domain knowledge is needed (use knowledge_search)  
-3. For complex topics, use BOTH tools to cross-validate information
-4. Think step-by-step and explain your reasoning
-5. Provide comprehensive, well-researched responses
-
-Always be thorough but concise. Use multiple tools when beneficial."""
-```
-
-### Intelligence Enhancement Benefits
-
-| Capability | Before Enhancement | After Enhancement | Value Delivered |
-|------------|-------------------|-------------------|-----------------|
-| **Tool Usage** | Single tool per query | Multi-tool coordination | **Cross-validated information** |
-| **Reasoning** | Basic responses | Step-by-step analysis | **Transparent logic** |
-| **Research Depth** | Surface-level answers | Comprehensive research | **Higher accuracy** |
-| **Decision Making** | Reactive tool use | Autonomous tool selection | **Intelligent processing** |
-| **Information Quality** | Single-source answers | Cross-referenced findings | **Reliable insights** |
-
-### Example Intelligence in Action
-
-#### Simple Query: "What is machine learning?"
-- **Enhanced Behavior**: Uses knowledge_search for foundational concepts, then web_search for latest developments
-- **Result**: Comprehensive answer combining established theory with current trends
-
-#### Complex Query: "Impact of AI on healthcare in 2024"
-- **Enhanced Behavior**: 
-  1. Uses web_search for 2024-specific developments
-  2. Uses knowledge_search for healthcare domain context
-  3. Cross-validates findings between sources
-  4. Provides step-by-step reasoning
-- **Result**: Well-researched, evidence-based analysis with transparent methodology
-
-### Technical Implementation
-The enhancement leverages Strands SDK's built-in agent loop capabilities:
-- **Multi-step reasoning cycles**: Agent can use multiple tools in sequence
-- **Autonomous decision making**: Agent determines which tools to use based on query analysis
-- **Cross-validation logic**: Agent compares information across different sources
-- **Quality assurance**: Agent ensures comprehensive coverage before responding
-
 #### ☁️ **Bedrock AgentCore Runtime - Serverless Deployment Platform**
 **What it provides:**
 - **Serverless Hosting**: Deploy agents without managing infrastructure
@@ -207,7 +158,7 @@ cp .env.example .env
 ```bash
 # AWS & AgentCore
 AWS_PROFILE=your_aws_profile_name
-AWS_REGION=us-east-1
+AWS_REGION=your_aws_region
 KNOWLEDGE_BASE_ID=your_knowledge_base_id
 
 # Cognito Authentication
@@ -238,7 +189,7 @@ python deploy_agentcore_v2.py
 **After deployment, update your `.env` file:**
 ```bash
 # Add the runtime ARN from deployment output
-echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:your_account_id:runtime/YourRuntimeName" >> .env
+echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:your_aws_region:your_account_id:runtime/YourRuntimeName" >> .env
 ```
 
 ### Step 3: Start Local Web Interface
@@ -316,7 +267,7 @@ If automated deployment fails, you can create the runtime manually:
 
 1. **AWS Console** → Bedrock → AgentCore → Create Runtime
 2. **Name**: `StrandsAgentCoreApp20250917`
-3. **Container URI**: `your_account_id.dkr.ecr.us-east-1.amazonaws.com/strands-agentcore-app-20250917:latest`
+3. **Container URI**: `your_account_id.dkr.ecr.your_aws_region.amazonaws.com/strands-agentcore-app-20250917:latest`
 4. **Environment Variables**: Set `TAVILY_API_KEY` and `KNOWLEDGE_BASE_ID`
 
 **Detailed Steps**: See `MANUAL_RUNTIME_CREATION.md`
@@ -485,7 +436,7 @@ def knowledge_search(query: str) -> str:
     
     try:
         session = boto3.Session(profile_name="your_aws_profile")
-        client = session.client('bedrock-agent-runtime', region_name='us-east-1')
+        client = session.client('bedrock-agent-runtime', region_name=os.getenv('AWS_REGION'))
         
         logger.info(f"Searching Knowledge Base {knowledge_base_id} for: {query}")
         
@@ -495,7 +446,7 @@ def knowledge_search(query: str) -> str:
                 'type': 'KNOWLEDGE_BASE',
                 'knowledgeBaseConfiguration': {
                     'knowledgeBaseId': knowledge_base_id,
-                    'modelArn': 'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+                    'modelArn': 'arn:aws:bedrock:your_aws_region::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
                 }
             }
         )
@@ -559,6 +510,30 @@ def call_agent(prompt, session_id):
 - **Bulletproof Isolation**: AgentCore's built-in session isolation
 - **Fresh Sessions**: Clean start for each login
 - **Scalable**: Supports unlimited concurrent users safely
+
+## 🧠 Enhanced Agent Intelligence
+
+### Autonomous Reasoning System Prompt
+The app uses an advanced system prompt that enables multi-step reasoning and autonomous tool selection:
+
+```python
+system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
+
+For each query:
+1. Analyze if you need current information (use web_search)
+2. Check if domain knowledge is needed (use knowledge_search)  
+3. For complex topics, use BOTH tools to cross-validate information
+4. Think step-by-step and explain your reasoning
+5. Provide comprehensive, well-researched responses
+
+Always be thorough but concise. Use multiple tools when beneficial."""
+```
+
+This enhancement transforms the agent from basic Q&A to intelligent research assistant with:
+- **Multi-tool coordination** for cross-validated information
+- **Step-by-step reasoning** with transparent logic  
+- **Autonomous decision making** for intelligent processing
+- **Comprehensive research** delivering higher accuracy
 
 ### Authentication & Sessions
 ```python
