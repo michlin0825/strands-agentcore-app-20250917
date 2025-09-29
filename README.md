@@ -618,9 +618,9 @@ strands-agentcore-app-20250917/
 
 - **v5.0** (2025-09-29): AgentCore native memory management, simplified architecture, enhanced session isolation
 - **v4.0** (2025-09-28): Modular architecture with separated data sourcing tools, codebase cleanup
-- **v3.0** (2025-01-28): Cognito authentication, persistent sessions, concise responses
-- **v2.0** (2025-01-28): Environment-based configuration, updated naming
-- **v1.0** (2025-01-28): Working implementation with response parsing
+- **v3.0** (2025-09-28): Cognito authentication, persistent sessions, concise responses
+- **v2.0** (2025-09-28): Environment-based configuration, updated naming
+- **v1.0** (2025-09-28): Working implementation with response parsing
 
 ## 🔗 Resources
 
