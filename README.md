@@ -160,38 +160,44 @@ TAVILY_API_KEY=your_tavily_api_key_here
 
 ## 🚀 Deployment
 
-### Two Types of Deployment
+### Two Types of Operations
 
-#### 🏗️ Infrastructure Deployment (First Time Setup)
+#### 🏗️ Infrastructure Deployment (One-Time Setup)
 ```bash
 python deploy_agentcore_v2.py
 ```
 
-**Purpose**: Creates the **AgentCore runtime infrastructure** in AWS cloud
-- Creates ECR repository for container images
-- Builds and pushes Docker image with your agent code
-- Creates AgentCore runtime in AWS Bedrock
-- Returns runtime ARN for local configuration
+**What it does**:
+- 📦 Creates ECR repository for container images
+- 🐳 Builds Docker image with your agent code
+- ☁️ Pushes image to AWS ECR
+- 🤖 Creates AgentCore runtime in AWS Bedrock
+- 📋 Returns runtime ARN for configuration
 
-**When to use**: 
-- First time setup
-- When you modify agent code (agent.py, tools, etc.)
-- When updating the container image
+**When to run**:
+- ✅ First time setup
+- ✅ When you modify agent code (agent.py, web_search_tool.py, knowledge_base_tool.py)
+- ✅ When updating dependencies or Dockerfile
 
-#### 🌐 Local Web Interface (Daily Usage)
+**Output**: You'll get a runtime ARN to add to your `.env` file
+
+#### 🌐 Local Application Startup (Daily Usage)
 ```bash
 ./start_env_app.sh
 ```
 
-**Purpose**: Starts the **local Streamlit web interface** that connects to deployed runtime
-- Validates environment and dependencies
-- Starts web app on http://localhost:8503
-- Connects to existing AgentCore runtime via AGENT_RUNTIME_ARN
+**What it does**:
+- ✅ Activates virtual environment
+- ✅ Validates environment variables
+- 🌐 Starts Streamlit web app on http://localhost:8503
+- 🔗 Connects to your deployed AgentCore runtime
 
-**When to use**:
-- Daily usage after initial setup
-- Testing and interacting with your deployed agent
-- No infrastructure changes needed
+**When to run**:
+- ✅ Every time you want to use the app
+- ✅ After restarting your computer
+- ✅ For testing and daily interaction
+
+**Requirements**: Must have completed infrastructure deployment first
 
 ### Manual Runtime Creation (Alternative)
 If automated deployment fails, you can create the runtime manually:
