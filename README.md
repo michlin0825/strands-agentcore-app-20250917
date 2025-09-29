@@ -435,7 +435,7 @@ strands-agentcore-app-20250917/
 - [Amazon Bedrock AgentCore Documentation](https://docs.aws.amazon.com/bedrock-agentcore/)
 - [Amazon Cognito Documentation](https://docs.aws.amazon.com/cognito/)
 - [Streamlit Documentation](https://docs.streamlit.io/)
-- [Strands SDK Documentation](https://github.com/strands-ai/strands)
+- [Strands SDK Documentation](https://strandsagents.com/latest/documentation/docs/api-reference/agent/)
 - [MCP (Model Context Protocol)](https://modelcontextprotocol.io/)
 
 ## 📄 License
