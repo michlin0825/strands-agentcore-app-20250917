@@ -64,16 +64,14 @@ sequenceDiagram
     Streamlit-->>User: Display clean answer
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Configuration
 
 ### Prerequisites
 - Python 3.8+, Docker Desktop, AWS CLI
 - AWS Profile: `CloudChef01` with Bedrock AgentCore permissions
 - Valid Cognito credentials
 
-### Setup Process
-
-#### Step 1: Clone and Prepare Environment
+### Step 1: Environment Setup & Configuration
 ```bash
 # Navigate to project
 cd /Users/mba/Desktop/strands-agentcore-app-20250917
@@ -87,10 +85,28 @@ pip install -r requirements.txt
 
 # Configure environment variables
 cp .env.example .env
-# Edit .env with your actual values (except AGENT_RUNTIME_ARN - will be set after deployment)
 ```
 
-#### Step 2: Deploy Infrastructure to AWS (First Time Only)
+**Edit `.env` file with your configuration:**
+```bash
+# AWS & AgentCore
+AWS_PROFILE=CloudChef01
+AWS_REGION=us-east-1
+KNOWLEDGE_BASE_ID=VVJWR6EQPY
+
+# Cognito Authentication
+COGNITO_USER_POOL_ID=us-east-1_LyhSJXjeF
+COGNITO_CLIENT_ID=2kiuoifa3ulekjbtdj4tngkt7h
+COGNITO_USERNAME=your_username_here
+COGNITO_PASSWORD=your_password_here
+
+# External APIs
+TAVILY_API_KEY=your_tavily_api_key_here
+
+# Note: AGENT_RUNTIME_ARN will be set after Step 2 deployment
+```
+
+### Step 2: Deploy Infrastructure to AWS (First Time Only)
 ```bash
 # Deploy AgentCore runtime to AWS cloud
 python deploy_agentcore_v2.py
@@ -103,13 +119,13 @@ python deploy_agentcore_v2.py
 - 🤖 **Creates AgentCore runtime** in AWS Bedrock
 - 📋 **Returns runtime ARN** for configuration
 
-#### Step 3: Update Configuration
+**After deployment, update your `.env` file:**
 ```bash
-# Copy the AGENT_RUNTIME_ARN from deployment output and add to .env file
+# Add the runtime ARN from deployment output
 echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/YourRuntimeName" >> .env
 ```
 
-#### Step 4: Start Local Web Interface
+### Step 3: Start Local Web Interface
 ```bash
 # Start the Streamlit web application
 ./start_env_app.sh
@@ -138,27 +154,7 @@ echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime
 4. **Knowledge Queries**: Domain-specific questions *(uses knowledge_base_tool.py)*
 5. **Session Persistence**: Refresh page - stay logged in!
 
-## 🔧 Configuration
-
-### Environment Variables
-```bash
-# AWS & AgentCore
-AWS_PROFILE=CloudChef01
-AWS_REGION=us-east-1
-AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/StrandsAgentCoreApp20250917-I3867LFr4j
-KNOWLEDGE_BASE_ID=VVJWR6EQPY
-
-# Cognito Authentication
-COGNITO_USER_POOL_ID=us-east-1_LyhSJXjeF
-COGNITO_CLIENT_ID=2kiuoifa3ulekjbtdj4tngkt7h
-COGNITO_USERNAME=your_username_here
-COGNITO_PASSWORD=your_password_here
-
-# External APIs
-TAVILY_API_KEY=your_tavily_api_key_here
-```
-
-## 🚀 Deployment
+## 🚀 Deployment Details
 
 ### Two Types of Operations
 
@@ -545,7 +541,7 @@ strands-agentcore-app-20250917/
 ├── test_cognito_auth.py           # Authentication testing
 ├── test_response_parsing.py       # Response parsing validation
 ├── test_memory_isolation.py       # Memory isolation testing
-├── .env.example                   # Environment template
+├── .env.example                   # Environment template with all required variables
 ├── .env                           # Local environment variables
 ├── .gitignore                     # Git exclusions
 └── venv/                          # Python virtual environment
