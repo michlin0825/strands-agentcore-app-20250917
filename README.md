@@ -71,24 +71,64 @@ sequenceDiagram
 - AWS Profile: `CloudChef01` with Bedrock AgentCore permissions
 - Valid Cognito credentials
 
-### Installation
+### Setup Process
+
+#### Step 1: Clone and Prepare Environment
 ```bash
 # Navigate to project
 cd /Users/mba/Desktop/strands-agentcore-app-20250917
 
-# Activate environment and install dependencies
+# Create and activate virtual environment
+python -m venv venv
 source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 
 # Configure environment variables
 cp .env.example .env
-# Edit .env with your actual values
+# Edit .env with your actual values (except AGENT_RUNTIME_ARN - will be set after deployment)
+```
 
-# Start the application
+#### Step 2: Deploy Infrastructure to AWS (First Time Only)
+```bash
+# Deploy AgentCore runtime to AWS cloud
+python deploy_agentcore_v2.py
+```
+
+**What this does:**
+- 🏗️ **Creates ECR repository** (if doesn't exist)
+- 🐳 **Builds Docker image** from your agent code
+- ☁️ **Pushes image to AWS ECR** (container registry)
+- 🤖 **Creates AgentCore runtime** in AWS Bedrock
+- 📋 **Returns runtime ARN** for configuration
+
+#### Step 3: Update Configuration
+```bash
+# Copy the AGENT_RUNTIME_ARN from deployment output and add to .env file
+echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/YourRuntimeName" >> .env
+```
+
+#### Step 4: Start Local Web Interface
+```bash
+# Start the Streamlit web application
 ./start_env_app.sh
 ```
 
-**Access**: http://localhost:8501
+**What this does:**
+- ✅ **Validates environment** and dependencies
+- 🌐 **Starts Streamlit web app** on http://localhost:8503
+- 🔗 **Connects to deployed AgentCore runtime** via AGENT_RUNTIME_ARN
+
+**Access**: http://localhost:8503
+
+### Daily Usage (After Initial Setup)
+```bash
+# Just start the web interface - no redeployment needed
+./start_env_app.sh
+```
+
+**Note**: Only redeploy with `python deploy_agentcore_v2.py` when you modify the agent code (agent.py, web_search_tool.py, knowledge_base_tool.py).
 
 ## 🎯 Usage Examples
 
@@ -120,12 +160,42 @@ TAVILY_API_KEY=your_tavily_api_key_here
 
 ## 🚀 Deployment
 
-### Automated Deployment
+### Two Types of Deployment
+
+#### 🏗️ Infrastructure Deployment (First Time Setup)
 ```bash
 python deploy_agentcore_v2.py
 ```
 
-### Manual Runtime Creation
+**Purpose**: Creates the **AgentCore runtime infrastructure** in AWS cloud
+- Creates ECR repository for container images
+- Builds and pushes Docker image with your agent code
+- Creates AgentCore runtime in AWS Bedrock
+- Returns runtime ARN for local configuration
+
+**When to use**: 
+- First time setup
+- When you modify agent code (agent.py, tools, etc.)
+- When updating the container image
+
+#### 🌐 Local Web Interface (Daily Usage)
+```bash
+./start_env_app.sh
+```
+
+**Purpose**: Starts the **local Streamlit web interface** that connects to deployed runtime
+- Validates environment and dependencies
+- Starts web app on http://localhost:8503
+- Connects to existing AgentCore runtime via AGENT_RUNTIME_ARN
+
+**When to use**:
+- Daily usage after initial setup
+- Testing and interacting with your deployed agent
+- No infrastructure changes needed
+
+### Manual Runtime Creation (Alternative)
+If automated deployment fails, you can create the runtime manually:
+
 1. **AWS Console** → Bedrock → AgentCore → Create Runtime
 2. **Name**: `StrandsAgentCoreApp20250917`
 3. **Container URI**: `111735445051.dkr.ecr.us-east-1.amazonaws.com/strands-agentcore-app-20250917:latest`
