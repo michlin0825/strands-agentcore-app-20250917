@@ -683,3 +683,21 @@ strands-agentcore-app-20250917/
 ## 📄 License
 
 MIT License - Feel free to use and modify for your projects!
+
+## 📋 Future Enhancements (TODO)
+
+### 🔗 Additional API Integrations
+- **NewsAPI**: Real-time news context for current events and breaking developments
+- **Alpha Vantage**: Financial and economic data for business discussions and market analysis
+
+### 🏗️ Custom MCP Server Development
+- **Multi-Source Research Orchestrator**: Cross-validate information across web, knowledge base, academic papers, and news sources
+- **Dynamic Tool Discovery & Management**: Agent self-diagnosis of tool availability and adaptive behavior management
+- **Conversation Analytics & Insights**: Analyze conversation patterns, user behavior, and provide personalized recommendations
+
+### 🔌 External MCP Server Integration
+- **AWS Documentation MCP**: Official AWS guidance and documentation access via `awslabs.aws-documentation-mcp-server`
+- **GitHub Integration MCP**: Real code examples and repository search via GitHub Copilot MCP
+- **DateTime Utilities MCP**: Time zone conversions, scheduling, and temporal calculations via `@modelcontextprotocol/server-datetime`
+
+*These enhancements would transform the app from intelligent Q&A to a comprehensive research and analysis platform with multi-modal context enrichment.*
