@@ -228,7 +228,7 @@ python test_response_parsing.py    # Test response parsing
 
 ### Modular Agent Architecture
 ```python
-# agent.py - Main agent with separated data sourcing
+# agent.py - Simplified agent with AgentCore native memory
 import os
 import json
 import logging
@@ -251,20 +251,19 @@ app = BedrockAgentCoreApp()
 # Initialize Strands agent with separated external and internal data sourcing tools
 agent = Agent(
     tools=[web_search, knowledge_search],
-    system_prompt="You are a helpful AI assistant. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Keep responses brief while maintaining factual accuracy."
+    system_prompt="You are a helpful AI assistant with memory of our conversation. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Reference previous conversation context when relevant."
 )
 
 @app.entrypoint
 def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """Process user input and return a response"""
+    """Process user input with AgentCore native memory management"""
     try:
         user_message = payload.get("prompt", "Hello")
         session_id = payload.get("session_id", "default-session")
-        memory_id = payload.get("memory_id", "helloworldmemory")
         
-        logger.info(f"Processing: {user_message}")
+        logger.info(f"Processing message for session: {session_id[:20]}...")
         
-        # Process with Strands agent (now with separated external and internal tools)
+        # Process with Strands agent - AgentCore handles memory via runtimeSessionId
         result = agent(user_message)
         
         return {
@@ -273,12 +272,11 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "content": [{"text": result.message}]
             },
             "session_id": session_id,
-            "memory_id": memory_id,
             "status": "success"
         }
         
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Error processing message: {e}")
         return {
             "error": str(e),
             "session_id": payload.get("session_id", "unknown"),
@@ -536,7 +534,7 @@ strands-agentcore-app-20250917/
 ├── screenshots/                     # App screenshots
 ├── streamlit_app/
 │   └── app_env.py                  # Main Streamlit app with Cognito auth
-├── agent.py                        # Strands agent with modular data sourcing
+├── agent.py                        # Strands agent with AgentCore native memory
 ├── web_search_tool.py              # External data sourcing (Tavily/MCP)
 ├── knowledge_base_tool.py          # Internal data sourcing (Bedrock KB/RAG)
 ├── Dockerfile                      # Container configuration
@@ -546,6 +544,7 @@ strands-agentcore-app-20250917/
 ├── test_deployed_agent.py         # Agent connectivity testing
 ├── test_cognito_auth.py           # Authentication testing
 ├── test_response_parsing.py       # Response parsing validation
+├── test_memory_isolation.py       # Memory isolation testing
 ├── .env.example                   # Environment template
 ├── .env                           # Local environment variables
 ├── .gitignore                     # Git exclusions
@@ -554,6 +553,7 @@ strands-agentcore-app-20250917/
 
 ## 📝 Version History
 
+- **v5.0** (2025-09-29): AgentCore native memory management, simplified architecture, enhanced session isolation
 - **v4.0** (2025-09-28): Modular architecture with separated data sourcing tools, codebase cleanup
 - **v3.0** (2025-01-28): Cognito authentication, persistent sessions, concise responses
 - **v2.0** (2025-01-28): Environment-based configuration, updated naming
