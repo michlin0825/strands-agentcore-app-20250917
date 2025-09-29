@@ -108,11 +108,12 @@ sequenceDiagram
     User->>Streamlit: Access webapp
     Streamlit->>Cognito: Authenticate user
     Cognito-->>Streamlit: Return auth token
+    Streamlit->>Streamlit: Generate fresh session ID
     Streamlit-->>User: Show chat interface
 
     User->>Streamlit: Send message
-    Streamlit->>AgentCore: Invoke agent runtime
-    AgentCore->>Strands: Process with MCP tools
+    Streamlit->>AgentCore: Invoke agent runtime (with runtimeSessionId)
+    AgentCore->>Strands: Process with native memory management
     
     alt Web search needed
         Strands->>Tavily: Search web for current info
@@ -125,9 +126,9 @@ sequenceDiagram
     end
     
     Strands-->>AgentCore: Generate response
-    AgentCore-->>Streamlit: Return nested response
-    Streamlit->>Streamlit: Parse response structure
-    Streamlit-->>User: Display clean answer
+    AgentCore-->>Streamlit: Return response with session context
+    Streamlit->>Streamlit: Parse response and update UI
+    Streamlit-->>User: Display answer with memory continuity
 ```
 
 ## 🚀 Quick Start & Configuration
