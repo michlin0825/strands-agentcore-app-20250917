@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Strands AgentCore App with separated external and internal data sourcing
+Strands AgentCore App with AgentCore native memory management
 """
 
 import os
@@ -25,20 +25,19 @@ app = BedrockAgentCoreApp()
 # Initialize Strands agent with separated external and internal data sourcing tools
 agent = Agent(
     tools=[web_search, knowledge_search],
-    system_prompt="You are a helpful AI assistant. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Keep responses brief while maintaining factual accuracy."
+    system_prompt="You are a helpful AI assistant with memory of our conversation. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Reference previous conversation context when relevant."
 )
 
 @app.entrypoint
 def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """Process user input and return a response"""
+    """Process user input with AgentCore native memory management"""
     try:
         user_message = payload.get("prompt", "Hello")
         session_id = payload.get("session_id", "default-session")
-        memory_id = payload.get("memory_id", "helloworldmemory")
         
-        logger.info(f"Processing: {user_message}")
+        logger.info(f"Processing message for session: {session_id[:20]}...")
         
-        # Process with Strands agent (now with separated external and internal tools)
+        # Process with Strands agent - AgentCore handles memory via runtimeSessionId
         result = agent(user_message)
         
         return {
@@ -47,12 +46,11 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
                 "content": [{"text": result.message}]
             },
             "session_id": session_id,
-            "memory_id": memory_id,
             "status": "success"
         }
         
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(f"Error processing message: {e}")
         return {
             "error": str(e),
             "session_id": payload.get("session_id", "unknown"),
@@ -60,5 +58,5 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    logger.info("Starting Strands AgentCore App with separated data sourcing tools...")
+    logger.info("Starting Strands AgentCore App with native memory management...")
     app.run()

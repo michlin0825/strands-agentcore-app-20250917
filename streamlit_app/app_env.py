@@ -18,7 +18,7 @@ st.set_page_config(page_title="AI Agent Powered by Bedrock AgentCore", page_icon
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 if 'session_id' not in st.session_state:
-    st.session_state.session_id = f"streamlit-session-{str(uuid.uuid4())}"
+    st.session_state.session_id = f"session-{str(uuid.uuid4())}"
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
 if 'user_email' not in st.session_state:
@@ -98,6 +98,9 @@ def login_form():
                     success, result = authenticate_user(username, password)
                     
                 if success:
+                    # Generate fresh session ID for new login (ensures memory isolation)
+                    st.session_state.session_id = f"session-{str(uuid.uuid4())}"
+                    st.session_state.messages = []  # Fresh conversation history
                     st.session_state.authenticated = True
                     st.session_state.user_email = username
                     set_persistent_session(username)
@@ -191,13 +194,14 @@ def main():
         st.divider()
         if st.button("🔄 Reset Chat"):
             st.session_state.messages = []
-            st.session_state.session_id = f"streamlit-session-{str(uuid.uuid4())}"
+            st.session_state.session_id = f"session-{str(uuid.uuid4())}"  # Fresh session for memory isolation
             st.rerun()
             
         if st.button("🚪 Logout"):
             st.session_state.authenticated = False
             st.session_state.user_email = None
             st.session_state.messages = []
+            st.session_state.session_id = f"session-{str(uuid.uuid4())}"  # Fresh session for next login
             clear_persistent_session()
             st.rerun()
     
