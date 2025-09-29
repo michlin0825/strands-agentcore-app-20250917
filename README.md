@@ -135,7 +135,7 @@ sequenceDiagram
 
 ### Prerequisites
 - Python 3.8+, Docker Desktop, AWS CLI
-- AWS Profile: `CloudChef01` with Bedrock AgentCore permissions
+- AWS Profile: `your_aws_profile` with Bedrock AgentCore permissions
 - Valid Cognito credentials
 
 ### Step 1: Environment Setup & Configuration
@@ -157,13 +157,13 @@ cp .env.example .env
 **Edit `.env` file with your configuration:**
 ```bash
 # AWS & AgentCore
-AWS_PROFILE=CloudChef01
+AWS_PROFILE=your_aws_profile_name
 AWS_REGION=us-east-1
-KNOWLEDGE_BASE_ID=VVJWR6EQPY
+KNOWLEDGE_BASE_ID=your_knowledge_base_id
 
 # Cognito Authentication
-COGNITO_USER_POOL_ID=us-east-1_LyhSJXjeF
-COGNITO_CLIENT_ID=2kiuoifa3ulekjbtdj4tngkt7h
+COGNITO_USER_POOL_ID=your_cognito_user_pool_id
+COGNITO_CLIENT_ID=your_cognito_client_id
 COGNITO_USERNAME=your_username_here
 COGNITO_PASSWORD=your_password_here
 
@@ -189,7 +189,7 @@ python deploy_agentcore_v2.py
 **After deployment, update your `.env` file:**
 ```bash
 # Add the runtime ARN from deployment output
-echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/YourRuntimeName" >> .env
+echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:us-east-1:your_account_id:runtime/YourRuntimeName" >> .env
 ```
 
 ### Step 3: Start Local Web Interface
@@ -267,7 +267,7 @@ If automated deployment fails, you can create the runtime manually:
 
 1. **AWS Console** → Bedrock → AgentCore → Create Runtime
 2. **Name**: `StrandsAgentCoreApp20250917`
-3. **Container URI**: `111735445051.dkr.ecr.us-east-1.amazonaws.com/strands-agentcore-app-20250917:latest`
+3. **Container URI**: `your_account_id.dkr.ecr.us-east-1.amazonaws.com/strands-agentcore-app-20250917:latest`
 4. **Environment Variables**: Set `TAVILY_API_KEY` and `KNOWLEDGE_BASE_ID`
 
 **Detailed Steps**: See `MANUAL_RUNTIME_CREATION.md`
@@ -432,10 +432,10 @@ def knowledge_search(query: str) -> str:
     Search company knowledge base for internal information.
     Use this for company policies, procedures, documentation, and internal knowledge.
     """
-    knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
+    knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID', 'your_knowledge_base_id')
     
     try:
-        session = boto3.Session(profile_name="CloudChef01")
+        session = boto3.Session(profile_name="your_aws_profile")
         client = session.client('bedrock-agent-runtime', region_name='us-east-1')
         
         logger.info(f"Searching Knowledge Base {knowledge_base_id} for: {query}")
