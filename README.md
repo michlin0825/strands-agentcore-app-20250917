@@ -680,10 +680,6 @@ strands-agentcore-app-20250917/
 - [Strands SDK Documentation](https://strandsagents.com/latest/documentation/docs/api-reference/agent/)
 - [MCP (Model Context Protocol)](https://modelcontextprotocol.io/)
 
-## 📄 License
-
-MIT License - Feel free to use and modify for your projects!
-
 ## 📋 Future Enhancements (TODO)
 
 ### 🔗 Additional API Integrations
@@ -701,3 +697,7 @@ MIT License - Feel free to use and modify for your projects!
 - **Conversation Analytics & Insights**: Analyze conversation patterns, user behavior, and provide personalized recommendations
 
 *These enhancements would transform the app from intelligent Q&A to a comprehensive research and analysis platform with multi-modal context enrichment.*
+
+## 📄 License
+
+MIT License - Feel free to use and modify for your projects!
