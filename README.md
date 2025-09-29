@@ -249,7 +249,7 @@ echo "AGENT_RUNTIME_ARN=arn:aws:bedrock-agentcore:your_aws_region:your_account_i
 
 ### Two Types of Operations
 
-#### 🏗️ Infrastructure Deployment (One-Time Setup)
+#### 1. Infrastructure Deployment (One-Time Setup)
 ```bash
 python deploy_agentcore_v2.py
 ```
@@ -268,7 +268,7 @@ python deploy_agentcore_v2.py
 
 **Output**: You'll get a runtime ARN to add to your `.env` file
 
-#### 🌐 Local Application Startup (Daily Usage)
+#### 2. Local Application Startup (Daily Usage)
 ```bash
 ./start_env_app.sh
 ```
