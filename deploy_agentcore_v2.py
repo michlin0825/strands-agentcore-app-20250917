@@ -3,6 +3,7 @@
 Deployment script for Strands AgentCore App 20250917 to AgentCore Runtime
 """
 
+import os
 import boto3
 import json
 import time

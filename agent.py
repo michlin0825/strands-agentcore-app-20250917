@@ -22,10 +22,19 @@ os.environ["BYPASS_TOOL_CONSENT"] = "true"
 # Initialize BedrockAgentCoreApp
 app = BedrockAgentCoreApp()
 
-# Initialize Strands agent with separated external and internal data sourcing tools
+# Initialize Strands agent with enhanced autonomous reasoning
 agent = Agent(
     tools=[web_search, knowledge_search],
-    system_prompt="You are a helpful AI assistant with memory of our conversation. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Reference previous conversation context when relevant."
+    system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
+
+For each query:
+1. Analyze if you need current information (use web_search)
+2. Check if domain knowledge is needed (use knowledge_search)  
+3. For complex topics, use BOTH tools to cross-validate information
+4. Think step-by-step and explain your reasoning
+5. Provide comprehensive, well-researched responses
+
+Always be thorough but concise. Use multiple tools when beneficial."""
 )
 
 @app.entrypoint
