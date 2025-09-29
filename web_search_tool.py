@@ -21,7 +21,7 @@ def web_search(query: str) -> str:
     Returns:
         Search results with relevant information
     """
-    api_key = os.getenv('TAVILY_API_KEY', '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')
+    api_key = os.getenv('TAVILY_API_KEY')
     
     if not api_key:
         return "Web search is not available (no API key configured)."

@@ -21,11 +21,11 @@ def knowledge_search(query: str) -> str:
     Returns:
         Relevant information from company knowledge base
     """
-    knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID', 'VVJWR6EQPY')
+    knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID')
     
     try:
-        session = boto3.Session(profile_name="CloudChef01")
-        client = session.client('bedrock-agent-runtime', region_name='us-east-1')
+        session = boto3.Session(profile_name=os.getenv('AWS_PROFILE'))
+        client = session.client('bedrock-agent-runtime', region_name=os.getenv('AWS_REGION', 'us-east-1'))
         
         logger.info(f"Searching Knowledge Base {knowledge_base_id} for: {query}")
         
