@@ -53,6 +53,55 @@ def web_search(query: str) -> str:
 
 **Value:** Provides the **agent intelligence and tool orchestration** - the "brain" of the application.
 
+## 🧠 Enhanced Intelligence System
+
+### Autonomous Reasoning Prompt
+The app uses an advanced system prompt that enables multi-step reasoning and autonomous tool selection:
+
+```python
+system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
+
+For each query:
+1. Analyze if you need current information (use web_search)
+2. Check if domain knowledge is needed (use knowledge_search)  
+3. For complex topics, use BOTH tools to cross-validate information
+4. Think step-by-step and explain your reasoning
+5. Provide comprehensive, well-researched responses
+
+Always be thorough but concise. Use multiple tools when beneficial."""
+```
+
+### Intelligence Enhancement Benefits
+
+| Capability | Before Enhancement | After Enhancement | Value Delivered |
+|------------|-------------------|-------------------|-----------------|
+| **Tool Usage** | Single tool per query | Multi-tool coordination | **Cross-validated information** |
+| **Reasoning** | Basic responses | Step-by-step analysis | **Transparent logic** |
+| **Research Depth** | Surface-level answers | Comprehensive research | **Higher accuracy** |
+| **Decision Making** | Reactive tool use | Autonomous tool selection | **Intelligent processing** |
+| **Information Quality** | Single-source answers | Cross-referenced findings | **Reliable insights** |
+
+### Example Intelligence in Action
+
+#### Simple Query: "What is machine learning?"
+- **Enhanced Behavior**: Uses knowledge_search for foundational concepts, then web_search for latest developments
+- **Result**: Comprehensive answer combining established theory with current trends
+
+#### Complex Query: "Impact of AI on healthcare in 2024"
+- **Enhanced Behavior**: 
+  1. Uses web_search for 2024-specific developments
+  2. Uses knowledge_search for healthcare domain context
+  3. Cross-validates findings between sources
+  4. Provides step-by-step reasoning
+- **Result**: Well-researched, evidence-based analysis with transparent methodology
+
+### Technical Implementation
+The enhancement leverages Strands SDK's built-in agent loop capabilities:
+- **Multi-step reasoning cycles**: Agent can use multiple tools in sequence
+- **Autonomous decision making**: Agent determines which tools to use based on query analysis
+- **Cross-validation logic**: Agent compares information across different sources
+- **Quality assurance**: Agent ensures comprehensive coverage before responding
+
 #### ☁️ **Bedrock AgentCore Runtime - Serverless Deployment Platform**
 **What it provides:**
 - **Serverless Hosting**: Deploy agents without managing infrastructure
@@ -616,6 +665,7 @@ strands-agentcore-app-20250917/
 
 ## 📝 Version History
 
+- **v6.0** (2025-09-29): Enhanced autonomous reasoning with multi-step intelligence and cross-validation
 - **v5.0** (2025-09-29): AgentCore native memory management, simplified architecture, enhanced session isolation
 - **v4.0** (2025-09-28): Modular architecture with separated data sourcing tools, codebase cleanup
 - **v3.0** (2025-09-28): Cognito authentication, persistent sessions, concise responses
