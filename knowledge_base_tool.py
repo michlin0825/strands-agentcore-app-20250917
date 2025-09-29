@@ -21,7 +21,7 @@ def knowledge_search(query: str) -> str:
     Returns:
         Relevant information from company knowledge base
     """
-    knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
+    knowledge_base_id = os.getenv('KNOWLEDGE_BASE_ID', 'VVJWR6EQPY')
     
     try:
         session = boto3.Session(profile_name="CloudChef01")
