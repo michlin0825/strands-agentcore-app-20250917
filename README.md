@@ -353,63 +353,49 @@ load_dotenv()
 def authenticate_user(username, password):
     """Authenticate user with AWS Cognito"""
     try:
-        client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION'))
-        
-        # Calculate SECRET_HASH for Cognito authentication
-        message = username + os.getenv('COGNITO_CLIENT_ID')
-        secret_key = os.getenv('COGNITO_CLIENT_SECRET', '').encode()
-        dig = hmac.new(secret_key, message.encode(), hashlib.sha256).digest()
-        secret_hash = base64.b64encode(dig).decode()
+        client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION', 'us-east-1'))
         
         response = client.initiate_auth(
             ClientId=os.getenv('COGNITO_CLIENT_ID'),
             AuthFlow='USER_PASSWORD_AUTH',
             AuthParameters={
                 'USERNAME': username,
-                'PASSWORD': password,
-                'SECRET_HASH': secret_hash
+                'PASSWORD': password
             }
         )
         
-        return response.get('AuthenticationResult') is not None
+        if response.get('AuthenticationResult'):
+            return True, response['AuthenticationResult']
+        return False, None
         
     except Exception as e:
-        st.error(f"Authentication failed: {str(e)}")
-        return False
+        return False, str(e)
 
 def set_persistent_session(email):
     """Set persistent session using URL parameters"""
-    # Create authentication token
+    # Generate simple auth token (in production, use proper JWT)
     auth_token = base64.b64encode(f"{email}:{int(time.time())}".encode()).decode()
     
-    # Set query parameters for session persistence
+    # Update URL with auth parameters
     st.query_params.auth_token = auth_token
     st.query_params.user = email
-    
-    # Store in session state
-    st.session_state.authenticated = True
-    st.session_state.user_email = email
 
 def check_persistent_session():
     """Check if user has valid persistent session"""
     try:
-        auth_token = st.query_params.get('auth_token')
-        user_email = st.query_params.get('user')
-        
-        if auth_token and user_email:
-            # Decode and validate token
-            decoded = base64.b64decode(auth_token).decode()
-            email, timestamp = decoded.split(':')
-            
-            # Check if token is still valid (24 hours)
-            if email == user_email and (time.time() - int(timestamp)) < 86400:
-                st.session_state.authenticated = True
-                st.session_state.user_email = user_email
-                return True
-                
-    except Exception:
+        # Check for auth token in query params (simple persistent session)
+        query_params = st.query_params
+        if 'auth_token' in query_params:
+            token = query_params['auth_token']
+            # Simple token validation (in production, use proper JWT validation)
+            if token and len(token) > 20:  # Basic validation
+                stored_email = query_params.get('user', '')
+                if stored_email:
+                    st.session_state.authenticated = True
+                    st.session_state.user_email = stored_email
+                    return True
+    except:
         pass
-    
     return False
 
 def invoke_agent_runtime(user_message):
