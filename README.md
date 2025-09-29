@@ -336,12 +336,6 @@ With CloudWatch Transaction Search configured, you also get:
 - CloudWatch → GenAI Observability → AgentCore Metrics
 - X-Ray Console → Traces → Search by session ID or error status
 
-**What You Can Monitor:**
-1. **Performance**: Response times and processing latency
-2. **Usage**: User activity patterns and peak times
-3. **Reliability**: Error rates and success metrics
-4. **Tool Effectiveness**: Which tools provide better results
-
 ## 🔍 Implementation Details
 
 ### Modular Agent Architecture
