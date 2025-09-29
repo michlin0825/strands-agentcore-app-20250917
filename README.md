@@ -131,6 +131,30 @@ sequenceDiagram
     Streamlit-->>User: Display answer with memory continuity
 ```
 
+## ⚡ Enhanced Agent Intelligence
+
+### Autonomous Reasoning System Prompt
+The app uses an advanced system prompt that enables multi-step reasoning and autonomous tool selection:
+
+```python
+system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
+
+For each query:
+1. Analyze if you need current information (use web_search)
+2. Check if domain knowledge is needed (use knowledge_search)  
+3. For complex topics, use BOTH tools to cross-validate information
+4. Think step-by-step and explain your reasoning
+5. Provide comprehensive, well-researched responses
+
+Always be thorough but concise. Use multiple tools when beneficial."""
+```
+
+This enhancement transforms the agent from basic Q&A to intelligent research assistant with:
+- **Multi-tool coordination** for cross-validated information
+- **Step-by-step reasoning** with transparent logic  
+- **Autonomous decision making** for intelligent processing
+- **Comprehensive research** delivering higher accuracy
+
 ## 🚀 Quick Start & Configuration
 
 ### Prerequisites
@@ -510,30 +534,6 @@ def call_agent(prompt, session_id):
 - **Bulletproof Isolation**: AgentCore's built-in session isolation
 - **Fresh Sessions**: Clean start for each login
 - **Scalable**: Supports unlimited concurrent users safely
-
-## 🧠 Enhanced Agent Intelligence
-
-### Autonomous Reasoning System Prompt
-The app uses an advanced system prompt that enables multi-step reasoning and autonomous tool selection:
-
-```python
-system_prompt="""You are an intelligent research assistant with autonomous reasoning capabilities.
-
-For each query:
-1. Analyze if you need current information (use web_search)
-2. Check if domain knowledge is needed (use knowledge_search)  
-3. For complex topics, use BOTH tools to cross-validate information
-4. Think step-by-step and explain your reasoning
-5. Provide comprehensive, well-researched responses
-
-Always be thorough but concise. Use multiple tools when beneficial."""
-```
-
-This enhancement transforms the agent from basic Q&A to intelligent research assistant with:
-- **Multi-tool coordination** for cross-validated information
-- **Step-by-step reasoning** with transparent logic  
-- **Autonomous decision making** for intelligent processing
-- **Comprehensive research** delivering higher accuracy
 
 ### Authentication & Sessions
 ```python
