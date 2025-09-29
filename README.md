@@ -21,15 +21,48 @@ A secure AI chat interface with real-time web search and knowledge base access, 
 - **Modular Tools**: Separated external (Tavily Web Search) and internal (Bedrock Knowledge Base) data sourcing
 
 ### Data Flow
-```
-User → Streamlit → Cognito Auth → AgentCore Runtime → Strands Agent → [Web Search | Knowledge Base] → Response
+```mermaid
+sequenceDiagram
+    participant User
+    participant Streamlit as Streamlit App
+    participant Cognito as Amazon Cognito
+    participant AgentCore as Bedrock AgentCore Runtime
+    participant Strands as Strands Agent
+    participant Tavily as Tavily Web Search
+    participant KB as Bedrock Knowledge Base
+
+    User->>Streamlit: Access webapp
+    Streamlit->>Cognito: Authenticate user
+    Cognito-->>Streamlit: Return auth token
+    Streamlit-->>User: Show chat interface
+
+    User->>Streamlit: Send message
+    Streamlit->>AgentCore: Invoke agent runtime
+    AgentCore->>Strands: Process with MCP tools
+    
+    alt Web search needed
+        Strands->>Tavily: Search web for current info
+        Tavily-->>Strands: Return search results
+    end
+    
+    alt Knowledge base query
+        Strands->>KB: Query domain knowledge
+        KB-->>Strands: Return relevant documents
+    end
+    
+    Strands-->>AgentCore: Generate response
+    AgentCore-->>Streamlit: Return nested response
+    Streamlit->>Streamlit: Parse response structure
+    Streamlit-->>User: Display clean answer
 ```
 
 ## 📸 Screenshots
 
-| App Login | Q&A in Action |
-|-----------|---------------|
-| ![Login](screenshots/screenshot_1.png) | ![Chat](screenshots/screenshot_2.png) |
+### App Login
+![App Login](screenshots/screenshot_1.png)
+
+### Q&A in Action
+![Q&A in Action](screenshots/screenshot_2.png)
 
 ## 🚀 Quick Start
 
