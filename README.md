@@ -210,7 +210,7 @@ def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
         }
 ```
 
-### External Data Sourcing (Tavily Web Search)
+### External Data Sourcing
 ```python
 # web_search_tool.py - Tavily web search for current information
 import os
@@ -225,12 +225,6 @@ def web_search(query: str) -> str:
     """
     Search the web for current information using Tavily.
     Use this when you need up-to-date information, news, or facts.
-    
-    Args:
-        query: The search query string
-        
-    Returns:
-        Search results with relevant information
     """
     api_key = os.getenv('TAVILY_API_KEY', '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')
     
@@ -285,7 +279,7 @@ def web_search(query: str) -> str:
         return f"Search failed: {str(e)}"
 ```
 
-### Internal Data Sourcing (Bedrock Knowledge Base)
+### Internal Data Sourcing
 ```python
 # knowledge_base_tool.py - Bedrock Knowledge Base for domain knowledge
 import os
@@ -300,12 +294,6 @@ def knowledge_search(query: str) -> str:
     """
     Search company knowledge base for internal information.
     Use this for company policies, procedures, documentation, and internal knowledge.
-    
-    Args:
-        query: The search query string
-        
-    Returns:
-        Relevant information from company knowledge base
     """
     knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
     
@@ -333,22 +321,16 @@ def knowledge_search(query: str) -> str:
         return f"Knowledge search failed: {str(e)}"
 ```
 
-### Authentication & Sessions (Cognito + Streamlit)
+### Authentication & Sessions
 ```python
 # streamlit_app/app_env.py - Cognito authentication with persistent sessions
 import streamlit as st
-import uuid
 import boto3
 import json
 import os
 from dotenv import load_dotenv
-import hmac
-import hashlib
 import base64
 import time
-
-# Load environment variables
-load_dotenv()
 
 def authenticate_user(username, password):
     """Authenticate user with AWS Cognito"""
@@ -373,30 +355,9 @@ def authenticate_user(username, password):
 
 def set_persistent_session(email):
     """Set persistent session using URL parameters"""
-    # Generate simple auth token (in production, use proper JWT)
     auth_token = base64.b64encode(f"{email}:{int(time.time())}".encode()).decode()
-    
-    # Update URL with auth parameters
     st.query_params.auth_token = auth_token
     st.query_params.user = email
-
-def check_persistent_session():
-    """Check if user has valid persistent session"""
-    try:
-        # Check for auth token in query params (simple persistent session)
-        query_params = st.query_params
-        if 'auth_token' in query_params:
-            token = query_params['auth_token']
-            # Simple token validation (in production, use proper JWT validation)
-            if token and len(token) > 20:  # Basic validation
-                stored_email = query_params.get('user', '')
-                if stored_email:
-                    st.session_state.authenticated = True
-                    st.session_state.user_email = stored_email
-                    return True
-    except:
-        pass
-    return False
 
 def call_agent(prompt, session_id):
     """Call the deployed Strands agent"""
