@@ -4,6 +4,7 @@ Deployment script for Strands AgentCore App 20250917 to AgentCore Runtime
 """
 
 import os
+import subprocess
 import boto3
 import json
 import time
@@ -16,25 +17,34 @@ REGION = os.getenv('AWS_REGION', 'us-east-1')
 REPOSITORY_NAME = "strands-agentcore-app-20250917"
 AWS_PROFILE = os.getenv('AWS_PROFILE')
 
-# Old runtime to delete
-OLD_RUNTIME_ARN = "arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/HelloWorldStrandsAgentV2-R3GAODHoRb"
+# Optional: Old runtime to delete (if provided)
+OLD_RUNTIME_ARN = os.getenv('OLD_RUNTIME_ARN', '')
+
+def get_session():
+    """Get boto3 session with optional profile"""
+    if AWS_PROFILE:
+        return boto3.Session(profile_name=AWS_PROFILE)
+    else:
+        return boto3.Session()  # Use default credentials
 
 def delete_old_runtime():
-    """Delete the old AgentCore runtime"""
+    """Delete the old AgentCore runtime if specified"""
+    if not OLD_RUNTIME_ARN:
+        print("ℹ️  No old runtime specified for deletion")
+        return
+        
     print("🗑️  Deleting old AgentCore runtime...")
-    
-    session = boto3.Session(profile_name=AWS_PROFILE)
     
     # Note: AgentCore runtimes may need to be deleted through AWS Console
     # or different API. For now, we'll skip deletion and create new runtime
     print("ℹ️  Skipping old runtime deletion - will be handled manually if needed")
-    print("ℹ️  Old runtime ARN: " + OLD_RUNTIME_ARN)
+    print(f"ℹ️  Old runtime ARN: {OLD_RUNTIME_ARN}")
 
 def create_ecr_repository():
     """Create ECR repository if it doesn't exist"""
     print("🔍 Checking ECR repository...")
     
-    session = boto3.Session(profile_name=AWS_PROFILE)
+    session = get_session()
     ecr_client = session.client('ecr', region_name=REGION)
     
     try:
@@ -64,7 +74,7 @@ def create_ecr_repository():
 
 def get_account_id():
     """Get AWS account ID"""
-    session = boto3.Session(profile_name=AWS_PROFILE)
+    session = get_session()
     sts_client = session.client('sts')
     return sts_client.get_caller_identity()['Account']
 
@@ -75,17 +85,14 @@ def build_and_push_image():
     account_id = get_account_id()
     repository_uri = f"{account_id}.dkr.ecr.{REGION}.amazonaws.com/{REPOSITORY_NAME}"
     
-    import subprocess
-    
     try:
         # Get ECR login token
         print("🔐 Getting ECR login token...")
-        result = subprocess.run([
-            "aws", "ecr", "get-login-password", 
-            "--region", REGION,
-            "--profile", AWS_PROFILE
-        ], capture_output=True, text=True, check=True)
-        
+        cmd = ["aws", "ecr", "get-login-password", "--region", REGION]
+        if AWS_PROFILE:
+            cmd.extend(["--profile", AWS_PROFILE])
+            
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         login_token = result.stdout.strip()
         
         # Docker login to ECR
@@ -123,6 +130,8 @@ def create_agent_runtime(image_uri):
     """Create AgentCore runtime"""
     print("🚀 Creating AgentCore runtime...")
     
+    account_id = get_account_id()
+    
     # Note: AgentCore runtime creation may need to be done through AWS Console
     # or different deployment method. This is a placeholder for the correct API
     
@@ -133,7 +142,7 @@ def create_agent_runtime(image_uri):
     print(f"   4. Runtime name: {AGENT_NAME}")
     
     # For now, return a placeholder ARN that will need to be updated manually
-    placeholder_arn = f"arn:aws:bedrock-agentcore:{REGION}:111735445051:runtime/{AGENT_NAME}-PLACEHOLDER"
+    placeholder_arn = f"arn:aws:bedrock-agentcore:{REGION}:{account_id}:runtime/{AGENT_NAME}-PLACEHOLDER"
     print(f"📝 Placeholder ARN: {placeholder_arn}")
     print("⚠️  You'll need to update this with the actual ARN after manual creation")
     
@@ -144,7 +153,7 @@ def main():
     print("🚀 Deploying Strands AgentCore App 20250917")
     print("=" * 50)
     
-    # Step 1: Delete old runtime
+    # Step 1: Delete old runtime (if specified)
     delete_old_runtime()
     
     # Step 2: Create ECR repository
