@@ -398,44 +398,43 @@ def check_persistent_session():
         pass
     return False
 
-def invoke_agent_runtime(user_message):
-    """Invoke Bedrock AgentCore Runtime with nested response parsing"""
+def call_agent(prompt, session_id):
+    """Call the deployed Strands agent"""
     try:
-        session = boto3.Session(profile_name=os.getenv('AWS_PROFILE'))
-        client = session.client('bedrock-agentcore-runtime', region_name=os.getenv('AWS_REGION'))
+        agent_runtime_arn = os.getenv('AGENT_RUNTIME_ARN')
+        if not agent_runtime_arn:
+            return "Error: AGENT_RUNTIME_ARN environment variable not set"
         
-        # Generate unique session and memory IDs
-        session_id = str(uuid.uuid4())
-        memory_id = "helloworldmemory"
+        client = boto3.client('bedrock-agentcore', region_name=os.getenv('AWS_REGION'))
         
-        # Invoke the agent runtime
+        payload = json.dumps({"prompt": prompt, "session_id": session_id})
+        
         response = client.invoke_agent_runtime(
-            runtimeArn=os.getenv('AGENT_RUNTIME_ARN'),
-            payload={
-                "prompt": user_message,
-                "session_id": session_id,
-                "memory_id": memory_id
-            }
+            agentRuntimeArn=agent_runtime_arn,
+            runtimeSessionId=session_id,
+            payload=payload
         )
         
-        # Parse deeply nested response structure
-        response_data = json.loads(response['payload'])
+        response_body = response['response'].read()
+        response_data = json.loads(response_body)
         
-        # Extract text from nested structure: response -> content -> [0] -> text -> content -> [0] -> text
-        if (response_data.get('response') and 
-            response_data['response'].get('content') and 
+        # Parse deeply nested response structure
+        if (response_data.get('status') == 'success' and
+            'response' in response_data and
+            'content' in response_data['response'] and
             len(response_data['response']['content']) > 0 and
-            response_data['response']['content'][0].get('text') and
-            response_data['response']['content'][0]['text'].get('content') and
-            len(response_data['response']['content'][0]['text']['content']) > 0):
+            'text' in response_data['response']['content'][0] and
+            isinstance(response_data['response']['content'][0]['text'], dict) and
+            'content' in response_data['response']['content'][0]['text'] and
+            len(response_data['response']['content'][0]['text']['content']) > 0 and
+            'text' in response_data['response']['content'][0]['text']['content'][0]):
             
             return response_data['response']['content'][0]['text']['content'][0]['text']
-        else:
-            return "I apologize, but I couldn't process your request properly. Please try again."
+        
+        return "Failed to extract text from deeply nested response"
             
     except Exception as e:
-        st.error(f"Error invoking agent: {str(e)}")
-        return "I'm experiencing technical difficulties. Please try again later."
+        return f"Error: {str(e)}"
 ```
 
 ## 📁 Project Structure
