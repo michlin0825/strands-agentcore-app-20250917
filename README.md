@@ -313,24 +313,34 @@ python test_response_parsing.py    # Test response parsing
 
 ## 📊 Built-in Observability
 
-### Automatic Monitoring (No Setup Required)
-Your app automatically gets enterprise-grade monitoring through AgentCore Runtime:
+### Basic Monitoring (No Setup Required)
+Your app automatically gets basic monitoring through AgentCore Runtime:
 
 - **📈 Runtime Metrics**: Invocation count, duration, error rates
 - **🧠 Memory Metrics**: Session operations and performance  
 - **🔧 Tool Metrics**: Tool usage and success rates
 - **👥 User Metrics**: Session count and user activity
 
-**View in CloudWatch**: 
-- Navigate to CloudWatch → Metrics → AWS/BedrockAgentCore
-- Monitor your agent's performance in real-time
-- Set up alarms for error rates or high latency
+**View in CloudWatch**: Navigate to CloudWatch → Metrics → AWS/BedrockAgentCore
 
-**What You Can Monitor Right Now:**
-1. **Performance**: How fast is my agent responding?
-2. **Usage**: How many users are using the app?
-3. **Reliability**: What's my error rate?
-4. **Tool Effectiveness**: Which tools are being used most?
+### Enhanced Monitoring (Setup Completed)
+With CloudWatch Transaction Search configured, you also get:
+
+- **🔍 End-to-end Tracing**: Complete request flows from Streamlit → AgentCore → Tools
+- **📊 Searchable Spans**: Find issues by session ID, error codes, or latency
+- **⚡ Performance Analysis**: Identify bottlenecks and optimization opportunities
+- **🎯 GenAI Dashboard**: Specialized AI agent monitoring and insights
+
+**Access Enhanced Monitoring**:
+- CloudWatch → Application Signals (APM) → Transaction Search
+- CloudWatch → GenAI Observability → AgentCore Metrics
+- X-Ray Console → Traces → Search by session ID or error status
+
+**What You Can Monitor:**
+1. **Performance**: Response times and processing latency
+2. **Usage**: User activity patterns and peak times
+3. **Reliability**: Error rates and success metrics
+4. **Tool Effectiveness**: Which tools provide better results
 
 ## 🔍 Implementation Details
 
