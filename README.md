@@ -230,3 +230,7 @@ strands-agentcore-app-20250917/
 - [Streamlit Documentation](https://docs.streamlit.io/)
 - [Strands SDK Documentation](https://github.com/strands-ai/strands)
 - [MCP (Model Context Protocol)](https://modelcontextprotocol.io/)
+
+## License
+
+MIT License - Feel free to use and modify for your projects!
