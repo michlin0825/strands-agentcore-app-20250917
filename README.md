@@ -685,6 +685,7 @@ strands-agentcore-app-20250917/
 ### 🔗 Additional API Integrations
 - **NewsAPI**: Real-time news context for current events and breaking developments
 - **Alpha Vantage**: Financial and economic data for business discussions and market analysis
+- **OpenWeatherMap**: Weather context for travel, events, and location-based discussions
 
 ### 🔌 External MCP Server Integration
 - **AWS Documentation MCP**: Official AWS guidance and documentation access via `awslabs.aws-documentation-mcp-server`
