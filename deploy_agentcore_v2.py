@@ -9,11 +9,11 @@ import time
 import sys
 from botocore.exceptions import ClientError
 
-# Configuration - Updated naming
-AGENT_NAME = "StrandsAgentCoreApp20250917"  # Reflects project folder name
-REGION = "us-east-1"
+# Configuration - use environment variables
+AGENT_NAME = os.getenv('AGENT_NAME', 'StrandsAgentCoreApp20250917')
+REGION = os.getenv('AWS_REGION', 'us-east-1')
 REPOSITORY_NAME = "strands-agentcore-app-20250917"
-AWS_PROFILE = "CloudChef01"
+AWS_PROFILE = os.getenv('AWS_PROFILE')
 
 # Old runtime to delete
 OLD_RUNTIME_ARN = "arn:aws:bedrock-agentcore:us-east-1:111735445051:runtime/HelloWorldStrandsAgentV2-R3GAODHoRb"
