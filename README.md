@@ -224,6 +224,83 @@ python test_response_parsing.py    # Test response parsing
 - **Session Not Persisting**: Check browser allows URL parameters
 - **Module Import Error**: Ensure virtual environment is activated
 
+## 💡 AgentCore Memory Improvements
+
+### Current Implementation Limitations
+The app uses basic AgentCore memory with static identifiers and no explicit conversation history management.
+
+### Recommended Enhancements
+
+#### 1. Dynamic Memory Management
+```python
+# Enhanced agent.py with dynamic memory IDs
+import hashlib
+
+@app.entrypoint
+def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
+    user_email = payload.get("user_email", "anonymous")
+    session_id = payload.get("session_id", "default-session")
+    
+    # Create user-specific memory ID
+    memory_id = f"user-{hashlib.md5(user_email.encode()).hexdigest()[:8]}-memory"
+    
+    # Enhanced payload with conversation context
+    conversation_context = payload.get("conversation_history", [])
+    
+    return {
+        "memory_id": memory_id,
+        "conversation_length": len(conversation_context)
+    }
+```
+
+#### 2. Explicit Conversation History
+```python
+# Enhanced streamlit integration
+def call_agent_with_history(prompt, session_id, conversation_history):
+    """Pass explicit conversation context to AgentCore"""
+    
+    # Format conversation history for AgentCore
+    formatted_history = [
+        {"role": msg["role"], "content": msg["content"]} 
+        for msg in conversation_history[-10:]  # Last 10 messages
+    ]
+    
+    payload = json.dumps({
+        "prompt": prompt,
+        "session_id": session_id,
+        "conversation_history": formatted_history,
+        "user_email": st.session_state.user_email
+    })
+```
+
+#### 3. Memory Type Configuration
+```python
+# Advanced memory configuration
+MEMORY_CONFIGS = {
+    "short_term": {"max_messages": 10, "ttl_hours": 1},
+    "long_term": {"max_messages": 100, "ttl_hours": 24},
+    "persistent": {"max_messages": 1000, "ttl_hours": 720}  # 30 days
+}
+
+def get_memory_config(user_type="standard"):
+    return MEMORY_CONFIGS.get(user_type, MEMORY_CONFIGS["short_term"])
+```
+
+### AWS Documentation Resources
+For implementing advanced AgentCore memory features:
+
+- **AgentCore Memory API**: Use AWS documentation MCP for `bedrock-agentcore` memory management
+- **Session Management**: Reference `invoke_agent_runtime` session parameters
+- **Memory Persistence**: Explore AgentCore memory storage options
+- **Context Windows**: Configure conversation context limits
+
+### Implementation Priority
+1. **High**: Dynamic memory IDs per user
+2. **Medium**: Explicit conversation history passing
+3. **Low**: Advanced memory type configuration
+
+**Note**: Enhanced memory features require AgentCore runtime updates and may impact response latency.
+
 ## 🔍 Implementation Details
 
 ### Modular Agent Architecture
@@ -396,6 +473,67 @@ def knowledge_search(query: str) -> str:
         logger.error(f"Knowledge base search error: {e}")
         return f"Knowledge search failed: {str(e)}"
 ```
+
+### AgentCore Memory Management
+```python
+# agent.py - Memory context handling
+@app.entrypoint
+def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Process user input with memory context"""
+    try:
+        user_message = payload.get("prompt", "Hello")
+        session_id = payload.get("session_id", "default-session")
+        memory_id = payload.get("memory_id", "helloworldmemory")  # Static memory identifier
+        
+        # Process with Strands agent (memory handled by AgentCore runtime)
+        result = agent(user_message)
+        
+        return {
+            "response": {
+                "role": "assistant", 
+                "content": [{"text": result.message}]
+            },
+            "session_id": session_id,
+            "memory_id": memory_id,  # Returned for session continuity
+            "status": "success"
+        }
+```
+
+```python
+# streamlit_app/app_env.py - Session and conversation management
+# Frontend conversation history (browser-based)
+if 'messages' not in st.session_state:
+    st.session_state.messages = []  # Stores full conversation in UI
+
+# Consistent session ID for AgentCore memory tracking
+if 'session_id' not in st.session_state:
+    st.session_state.session_id = f"streamlit-session-{str(uuid.uuid4())}"
+
+def call_agent(prompt, session_id):
+    """Call agent with session context for memory continuity"""
+    payload = json.dumps({"prompt": prompt, "session_id": session_id})
+    
+    response = client.invoke_agent_runtime(
+        agentRuntimeArn=agent_runtime_arn,
+        runtimeSessionId=session_id,  # AgentCore uses this for memory context
+        payload=payload
+    )
+
+# Add messages to frontend history for UI display
+st.session_state.messages.append({"role": "user", "content": prompt})
+st.session_state.messages.append({"role": "assistant", "content": response})
+```
+
+**Current Memory Implementation:**
+- **Static Memory ID**: Uses fixed `"helloworldmemory"` identifier
+- **Session-Based**: AgentCore tracks conversations via `runtimeSessionId`
+- **Frontend History**: Streamlit maintains UI conversation display
+- **No Explicit Context**: Previous messages not passed to agent explicitly
+
+**Memory Limitations:**
+- **Basic Implementation**: Relies on AgentCore's default memory handling
+- **No Custom Memory Types**: Doesn't leverage AgentCore's advanced memory modules
+- **Limited Context Control**: No explicit conversation history management
 
 ### Authentication & Sessions
 ```python
