@@ -153,42 +153,303 @@ python test_response_parsing.py    # Test response parsing
 ### Modular Agent Architecture
 ```python
 # agent.py - Main agent with separated data sourcing
+import os
+import json
+import logging
+from typing import Dict, Any
 from strands import Agent
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
 from web_search_tool import web_search
 from knowledge_base_tool import knowledge_search
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Set environment for tool consent
+os.environ["BYPASS_TOOL_CONSENT"] = "true"
+
+# Initialize BedrockAgentCoreApp
+app = BedrockAgentCoreApp()
+
+# Initialize Strands agent with separated external and internal data sourcing tools
 agent = Agent(
     tools=[web_search, knowledge_search],
-    system_prompt="Provide concise, accurate answers. Use tools for current information or specific knowledge."
+    system_prompt="You are a helpful AI assistant. Provide concise, accurate, and direct answers. Use tools when needed for current information or specific knowledge. Keep responses brief while maintaining factual accuracy."
 )
+
+@app.entrypoint
+def invoke(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Process user input and return a response"""
+    try:
+        user_message = payload.get("prompt", "Hello")
+        session_id = payload.get("session_id", "default-session")
+        memory_id = payload.get("memory_id", "helloworldmemory")
+        
+        logger.info(f"Processing: {user_message}")
+        
+        # Process with Strands agent (now with separated external and internal tools)
+        result = agent(user_message)
+        
+        return {
+            "response": {
+                "role": "assistant",
+                "content": [{"text": result.message}]
+            },
+            "session_id": session_id,
+            "memory_id": memory_id,
+            "status": "success"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return {
+            "error": str(e),
+            "session_id": payload.get("session_id", "unknown"),
+            "status": "error"
+        }
 ```
 
-### External Data Sourcing
+### External Data Sourcing (Tavily Web Search)
 ```python
 # web_search_tool.py - Tavily web search for current information
+import os
+import requests
+import logging
+from strands import tool
+
+logger = logging.getLogger(__name__)
+
 @tool
 def web_search(query: str) -> str:
-    """Search the web for current information using Tavily."""
-    # Implementation details...
+    """
+    Search the web for current information using Tavily.
+    Use this when you need up-to-date information, news, or facts.
+    
+    Args:
+        query: The search query string
+        
+    Returns:
+        Search results with relevant information
+    """
+    api_key = os.getenv('TAVILY_API_KEY', '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')
+    
+    if not api_key:
+        return "Web search is not available (no API key configured)."
+    
+    try:
+        url = "https://api.tavily.com/search"
+        payload = {
+            "api_key": api_key,
+            "query": query,
+            "search_depth": "basic",
+            "include_answer": True,
+            "include_images": False,
+            "include_raw_content": False,
+            "max_results": 3
+        }
+        
+        logger.info(f"Searching Tavily for: {query}")
+        response = requests.post(url, json=payload, timeout=10)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        # Format results
+        results = []
+        
+        # Add direct answer if available
+        if data.get('answer'):
+            results.append(f"**Answer:** {data['answer']}")
+        
+        # Add search results
+        if data.get('results'):
+            results.append("**Sources:**")
+            for i, result in enumerate(data['results'][:3], 1):
+                title = result.get('title', 'No title')
+                content = result.get('content', 'No content')
+                url = result.get('url', 'No URL')
+                
+                # Truncate content if too long
+                if len(content) > 150:
+                    content = content[:150] + "..."
+                
+                results.append(f"{i}. {title}")
+                results.append(f"   {content}")
+                results.append(f"   {url}")
+        
+        return "\n".join(results) if results else "No search results found."
+        
+    except Exception as e:
+        logger.error(f"Tavily search error: {e}")
+        return f"Search failed: {str(e)}"
 ```
 
-### Internal Data Sourcing
+### Internal Data Sourcing (Bedrock Knowledge Base)
 ```python
 # knowledge_base_tool.py - Bedrock Knowledge Base for domain knowledge
+import os
+import logging
+import boto3
+from strands import tool
+
+logger = logging.getLogger(__name__)
+
 @tool
 def knowledge_search(query: str) -> str:
-    """Search company knowledge base for internal information."""
-    # Implementation details...
+    """
+    Search company knowledge base for internal information.
+    Use this for company policies, procedures, documentation, and internal knowledge.
+    
+    Args:
+        query: The search query string
+        
+    Returns:
+        Relevant information from company knowledge base
+    """
+    knowledge_base_id = os.getenv('BEDROCK_KB_ID', 'VVJWR6EQPY')
+    
+    try:
+        session = boto3.Session(profile_name="CloudChef01")
+        client = session.client('bedrock-agent-runtime', region_name='us-east-1')
+        
+        logger.info(f"Searching Knowledge Base {knowledge_base_id} for: {query}")
+        
+        response = client.retrieve_and_generate(
+            input={'text': query},
+            retrieveAndGenerateConfiguration={
+                'type': 'KNOWLEDGE_BASE',
+                'knowledgeBaseConfiguration': {
+                    'knowledgeBaseId': knowledge_base_id,
+                    'modelArn': 'arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+                }
+            }
+        )
+        
+        return response['output']['text']
+        
+    except Exception as e:
+        logger.error(f"Knowledge base search error: {e}")
+        return f"Knowledge search failed: {str(e)}"
 ```
 
-### Authentication & Sessions
+### Authentication & Sessions (Cognito + Streamlit)
 ```python
 # streamlit_app/app_env.py - Cognito authentication with persistent sessions
+import streamlit as st
+import uuid
+import boto3
+import json
+import os
+from dotenv import load_dotenv
+import hmac
+import hashlib
+import base64
+import time
+
+# Load environment variables
+load_dotenv()
+
 def authenticate_user(username, password):
-    # Cognito authentication implementation
-    
+    """Authenticate user with AWS Cognito"""
+    try:
+        client = boto3.client('cognito-idp', region_name=os.getenv('AWS_REGION'))
+        
+        # Calculate SECRET_HASH for Cognito authentication
+        message = username + os.getenv('COGNITO_CLIENT_ID')
+        secret_key = os.getenv('COGNITO_CLIENT_SECRET', '').encode()
+        dig = hmac.new(secret_key, message.encode(), hashlib.sha256).digest()
+        secret_hash = base64.b64encode(dig).decode()
+        
+        response = client.initiate_auth(
+            ClientId=os.getenv('COGNITO_CLIENT_ID'),
+            AuthFlow='USER_PASSWORD_AUTH',
+            AuthParameters={
+                'USERNAME': username,
+                'PASSWORD': password,
+                'SECRET_HASH': secret_hash
+            }
+        )
+        
+        return response.get('AuthenticationResult') is not None
+        
+    except Exception as e:
+        st.error(f"Authentication failed: {str(e)}")
+        return False
+
 def set_persistent_session(email):
-    # Session management with URL parameters
+    """Set persistent session using URL parameters"""
+    # Create authentication token
+    auth_token = base64.b64encode(f"{email}:{int(time.time())}".encode()).decode()
+    
+    # Set query parameters for session persistence
+    st.query_params.auth_token = auth_token
+    st.query_params.user = email
+    
+    # Store in session state
+    st.session_state.authenticated = True
+    st.session_state.user_email = email
+
+def check_persistent_session():
+    """Check if user has valid persistent session"""
+    try:
+        auth_token = st.query_params.get('auth_token')
+        user_email = st.query_params.get('user')
+        
+        if auth_token and user_email:
+            # Decode and validate token
+            decoded = base64.b64decode(auth_token).decode()
+            email, timestamp = decoded.split(':')
+            
+            # Check if token is still valid (24 hours)
+            if email == user_email and (time.time() - int(timestamp)) < 86400:
+                st.session_state.authenticated = True
+                st.session_state.user_email = user_email
+                return True
+                
+    except Exception:
+        pass
+    
+    return False
+
+def invoke_agent_runtime(user_message):
+    """Invoke Bedrock AgentCore Runtime with nested response parsing"""
+    try:
+        session = boto3.Session(profile_name=os.getenv('AWS_PROFILE'))
+        client = session.client('bedrock-agentcore-runtime', region_name=os.getenv('AWS_REGION'))
+        
+        # Generate unique session and memory IDs
+        session_id = str(uuid.uuid4())
+        memory_id = "helloworldmemory"
+        
+        # Invoke the agent runtime
+        response = client.invoke_agent_runtime(
+            runtimeArn=os.getenv('AGENT_RUNTIME_ARN'),
+            payload={
+                "prompt": user_message,
+                "session_id": session_id,
+                "memory_id": memory_id
+            }
+        )
+        
+        # Parse deeply nested response structure
+        response_data = json.loads(response['payload'])
+        
+        # Extract text from nested structure: response -> content -> [0] -> text -> content -> [0] -> text
+        if (response_data.get('response') and 
+            response_data['response'].get('content') and 
+            len(response_data['response']['content']) > 0 and
+            response_data['response']['content'][0].get('text') and
+            response_data['response']['content'][0]['text'].get('content') and
+            len(response_data['response']['content'][0]['text']['content']) > 0):
+            
+            return response_data['response']['content'][0]['text']['content'][0]['text']
+        else:
+            return "I apologize, but I couldn't process your request properly. Please try again."
+            
+    except Exception as e:
+        st.error(f"Error invoking agent: {str(e)}")
+        return "I'm experiencing technical difficulties. Please try again later."
 ```
 
 ## 📁 Project Structure
